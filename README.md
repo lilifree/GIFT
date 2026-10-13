@@ -6,8 +6,8 @@
 
 <p>
   <a href="#-overview">Overview</a> •
-  <a href="#-results">Results</a> •
   <a href="#-getting-started">Getting Started</a> •
+  <a href="#-results">Results</a> •
   <a href="#-citation">Citation</a>
 </p>
 
@@ -22,46 +22,6 @@ Reasoning LLMs are trained with two complementary signals: **sparse, outcome-gro
 <p align="center">
   <img src="assets/gift_overview.png" width="95%" alt="GIFT overview: the distillation gradient d_i is decomposed against the GRPO gradient r_i into a conflict component a_i and a complement component b_i, tokens are ranked by a priority score, and the selection budget is annealed from all tokens to none"/>
 </p>
-
-<table>
-<tr>
-<td width="25%" align="center"><b>🛡️ Safety filter</b><br/><sub>The sign of the parallel component <i>a<sub>i</sub></i> detects first-order conflict with the RL update</sub></td>
-<td width="25%" align="center"><b>🧭 Value measure</b><br/><sub>The orthogonal norm <i>b<sub>i</sub></i> measures guidance that rescaling the RL gradient cannot reproduce</sub></td>
-<td width="25%" align="center"><b>⚡ Closed-form scoring</b><br/><sub>Computed per token from forward-pass statistics, with no extra backward pass</sub></td>
-<td width="25%" align="center"><b>📉 Coverage annealing</b><br/><sub>The token budget shrinks while λ stays at 1. Conflicting tokens are dropped first</sub></td>
-</tr>
-</table>
-
-## 📊 Results
-
-**Mathematical reasoning** across Qwen3 scales (mean@12, %). Training data is DeepMath-103K. Avg. is the mean over AMC23, AIME24 and AIME25.
-
-| Size | Bench. | BASE | GRPO | OPSD | SDPO | RLSD | RLCSD | OPDVR | LUFFY | UFT | **GIFT** |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| 1.7B | AMC23 | 75.50 | 75.70 | 75.60 | 75.30 | 75.30 | <u>75.80</u> | **76.51** | 75.40 | 74.60 | <u>75.80</u> <sub>(+0.40%)</sub> |
-| | AIME24 | 44.44 | 45.28 | 45.56 | 44.72 | 44.72 | 46.94 | 46.67 | <u>48.33</u> | <u>48.33</u> | **48.61** <sub>(+9.38%)</sub> |
-| | AIME25 | 35.00 | 35.56 | 33.33 | <u>36.67</u> | 34.72 | 34.72 | 35.83 | 34.17 | <u>36.67</u> | **38.33** <sub>(+9.51%)</sub> |
-| | Avg. | 51.65 | 52.18 | 51.50 | 52.23 | 51.58 | 52.49 | 53.00 | 52.63 | <u>53.20</u> | **54.25** <sub>(+5.03%)</sub> |
-| 4B | AMC23 | 88.45 | 89.16 | 88.25 | 88.96 | 88.86 | **90.26** | 88.45 | 89.16 | <u>89.66</u> | 88.55 <sub>(+0.11%)</sub> |
-| | AIME24 | 71.67 | <u>74.17</u> | 73.06 | 70.83 | 73.61 | 72.22 | 73.61 | **76.11** | 70.56 | 73.33 <sub>(+2.32%)</sub> |
-| | AIME25 | 63.89 | 63.61 | <u>67.22</u> | <u>67.22</u> | 63.61 | 64.17 | 64.72 | 65.28 | 64.72 | **69.72** <sub>(+9.13%)</sub> |
-| | Avg. | 74.67 | 75.65 | 76.18 | 75.67 | 75.36 | 75.55 | 75.59 | <u>76.85</u> | 74.98 | **77.20** <sub>(+3.39%)</sub> |
-| 8B | AMC23 | 89.16 | 89.36 | 88.76 | 89.56 | 88.76 | 89.26 | **89.96** | **89.96** | 88.86 | <u>89.66</u> <sub>(+0.56%)</sub> |
-| | AIME24 | 75.00 | 74.72 | **77.22** | 75.83 | 75.28 | <u>76.11</u> | 74.44 | 73.33 | <u>76.11</u> | <u>76.11</u> <sub>(+1.48%)</sub> |
-| | AIME25 | 65.83 | 65.83 | 66.39 | 66.39 | <u>69.72</u> | 68.06 | <u>69.72</u> | 67.50 | 66.39 | **71.11** <sub>(+8.02%)</sub> |
-| | Avg. | 76.67 | 76.64 | 77.46 | 77.26 | 77.92 | 77.81 | <u>78.04</u> | 76.93 | 77.12 | **78.96** <sub>(+2.99%)</sub> |
-
-**Logical reasoning** on Knights-and-Knaves (pass@1, %). The in-distribution (ID) split has 4–8 roles. The out-of-distribution (OOD) splits have 9, 10 and 11 roles.
-
-| Benchmark | BASE | GRPO | OPSD | SDPO | RLSD | RLCSD | OPDVR | LUFFY | UFT | **GIFT** |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| ID · 4–8 roles | 72.40 | 73.40 | 72.80 | **75.20** | 73.60 | 74.00 | 73.00 | <u>74.60</u> | 74.20 | 73.40 <sub>(+1.38%)</sub> |
-| OOD · 9 roles | 69.00 | 72.00 | **75.00** | <u>73.00</u> | 71.00 | 69.00 | 71.00 | 67.00 | 71.00 | <u>73.00</u> <sub>(+5.80%)</sub> |
-| OOD · 10 roles | <u>59.00</u> | 56.00 | <u>59.00</u> | 56.00 | 55.00 | <u>59.00</u> | 57.00 | <u>59.00</u> | 56.00 | **61.00** <sub>(+3.39%)</sub> |
-| OOD · 11 roles | 42.00 | **46.00** | 41.00 | 40.00 | 41.00 | <u>44.00</u> | <u>44.00</u> | 43.00 | 40.00 | <u>44.00</u> <sub>(+4.76%)</sub> |
-| Avg. | 60.60 | 61.85 | <u>61.95</u> | 61.05 | 60.15 | 61.50 | 61.25 | 60.90 | 60.30 | **62.85** <sub>(+3.71%)</sub> |
-
-In both tables, **bold** marks the best score, <u>underline</u> the second best, and parentheses give GIFT's relative gain over BASE.
 
 ## 🚀 Getting Started
 
@@ -124,7 +84,7 @@ bash scripts/gift/main/run_gift.sh <your_config>.yaml
 
 Hydra overrides placed after the config path are passed through to verl. Checkpoints are written to `output_dir`. Logs go to the console, TensorBoard and files, and also to SwanLab when `use_swanlab: true`.
 
-## 🧪 Testing
+### Testing
 
 The unit tests run on CPU and need no models or data:
 
@@ -133,6 +93,37 @@ PYTHONPATH=scripts/gift/main:third_party/verl:. python scripts/gift/main/test_gi
 ```
 
 They check that the closed-form $a_i$ and $b_i$ match logit-space autograd, that the strongest conflicts are dropped first, that tokens with a zero GRPO gradient score as neutral, and that the coverage schedule and the fixed $\lambda$ follow the paper.
+
+## 📊 Results
+
+**Mathematical reasoning** across Qwen3 scales (mean@12, %). Training data is DeepMath-103K. Avg. is the mean over AMC23, AIME24 and AIME25.
+
+| Size | Bench. | BASE | GRPO | OPSD | SDPO | RLSD | RLCSD | OPDVR | LUFFY | UFT | **GIFT** |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| 1.7B | AMC23 | 75.50 | 75.70 | 75.60 | 75.30 | 75.30 | <u>75.80</u> | **76.51** | 75.40 | 74.60 | <u>75.80</u> <sub>(+0.40%)</sub> |
+| | AIME24 | 44.44 | 45.28 | 45.56 | 44.72 | 44.72 | 46.94 | 46.67 | <u>48.33</u> | <u>48.33</u> | **48.61** <sub>(+9.38%)</sub> |
+| | AIME25 | 35.00 | 35.56 | 33.33 | <u>36.67</u> | 34.72 | 34.72 | 35.83 | 34.17 | <u>36.67</u> | **38.33** <sub>(+9.51%)</sub> |
+| | Avg. | 51.65 | 52.18 | 51.50 | 52.23 | 51.58 | 52.49 | 53.00 | 52.63 | <u>53.20</u> | **54.25** <sub>(+5.03%)</sub> |
+| 4B | AMC23 | 88.45 | 89.16 | 88.25 | 88.96 | 88.86 | **90.26** | 88.45 | 89.16 | <u>89.66</u> | 88.55 <sub>(+0.11%)</sub> |
+| | AIME24 | 71.67 | <u>74.17</u> | 73.06 | 70.83 | 73.61 | 72.22 | 73.61 | **76.11** | 70.56 | 73.33 <sub>(+2.32%)</sub> |
+| | AIME25 | 63.89 | 63.61 | <u>67.22</u> | <u>67.22</u> | 63.61 | 64.17 | 64.72 | 65.28 | 64.72 | **69.72** <sub>(+9.13%)</sub> |
+| | Avg. | 74.67 | 75.65 | 76.18 | 75.67 | 75.36 | 75.55 | 75.59 | <u>76.85</u> | 74.98 | **77.20** <sub>(+3.39%)</sub> |
+| 8B | AMC23 | 89.16 | 89.36 | 88.76 | 89.56 | 88.76 | 89.26 | **89.96** | **89.96** | 88.86 | <u>89.66</u> <sub>(+0.56%)</sub> |
+| | AIME24 | 75.00 | 74.72 | **77.22** | 75.83 | 75.28 | <u>76.11</u> | 74.44 | 73.33 | <u>76.11</u> | <u>76.11</u> <sub>(+1.48%)</sub> |
+| | AIME25 | 65.83 | 65.83 | 66.39 | 66.39 | <u>69.72</u> | 68.06 | <u>69.72</u> | 67.50 | 66.39 | **71.11** <sub>(+8.02%)</sub> |
+| | Avg. | 76.67 | 76.64 | 77.46 | 77.26 | 77.92 | 77.81 | <u>78.04</u> | 76.93 | 77.12 | **78.96** <sub>(+2.99%)</sub> |
+
+**Logical reasoning** on Knights-and-Knaves (pass@1, %). The in-distribution (ID) split has 4–8 roles. The out-of-distribution (OOD) splits have 9, 10 and 11 roles.
+
+| Benchmark | BASE | GRPO | OPSD | SDPO | RLSD | RLCSD | OPDVR | LUFFY | UFT | **GIFT** |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| ID · 4–8 roles | 72.40 | 73.40 | 72.80 | **75.20** | 73.60 | 74.00 | 73.00 | <u>74.60</u> | 74.20 | 73.40 <sub>(+1.38%)</sub> |
+| OOD · 9 roles | 69.00 | 72.00 | **75.00** | <u>73.00</u> | 71.00 | 69.00 | 71.00 | 67.00 | 71.00 | <u>73.00</u> <sub>(+5.80%)</sub> |
+| OOD · 10 roles | <u>59.00</u> | 56.00 | <u>59.00</u> | 56.00 | 55.00 | <u>59.00</u> | 57.00 | <u>59.00</u> | 56.00 | **61.00** <sub>(+3.39%)</sub> |
+| OOD · 11 roles | 42.00 | **46.00** | 41.00 | 40.00 | 41.00 | <u>44.00</u> | <u>44.00</u> | 43.00 | 40.00 | <u>44.00</u> <sub>(+4.76%)</sub> |
+| Avg. | 60.60 | 61.85 | <u>61.95</u> | 61.05 | 60.15 | 61.50 | 61.25 | 60.90 | 60.30 | **62.85** <sub>(+3.71%)</sub> |
+
+In both tables, **bold** marks the best score, <u>underline</u> the second best, and parentheses give GIFT's relative gain over BASE.
 
 ## 🗂️ Repository Layout
 
