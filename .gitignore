@@ -5,6 +5,9 @@ __pycache__/
 # Paper (not distributed with the code)
 GIFT.pdf
 
+# Internal experiment configs (not distributed with the code)
+/scripts/gift/main/*.yaml
+
 # Local data, model weights and run outputs
 /data/
 /models/
