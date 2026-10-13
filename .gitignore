@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Paper (not distributed with the code)
+GIFT.pdf
+
+# Local data, model weights and run outputs
+/data/
+/models/
+/outputs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

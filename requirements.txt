@@ -1,0 +1,38 @@
+# Core
+# torch 2.10+ defaults to CUDA 13 wheels which require a newer NVIDIA driver
+# than CUDA 12.x systems ship. Pin to the CUDA 12 range. For exact CUDA match,
+# install torch from the PyTorch index:
+#   pip install torch>=2.5.0,<2.10 --index-url https://download.pytorch.org/whl/cu126
+torch>=2.5.0,<2.10
+transformers>=4.45.0
+accelerate>=1.0.0
+datasets>=3.0.0
+peft>=0.14.0
+
+# Training
+deepspeed>=0.15.0
+
+# Generation
+vllm>=0.6.0
+
+# Attention
+flash-attn>=2.6.0
+
+# Logging
+swanlab>=0.5.0
+wandb>=0.17.0
+
+# LLM-as-Judge
+openai>=1.0.0
+
+# Evaluation
+math-verify>=0.7.0
+
+# Utils
+pyyaml
+tqdm
+numpy
+
+# Data download
+huggingface_hub>=0.20.0
+pyarrow>=14.0.0

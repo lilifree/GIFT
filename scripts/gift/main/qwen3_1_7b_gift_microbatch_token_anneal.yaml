@@ -1,0 +1,80 @@
+# Qwen3-1.7B scale reproduction of the 8B GIFT microbatch token-only run.
+# All optimization, data, evaluation, and annealing settings are held fixed.
+gift_piecewise_enabled: true
+gift_enabled: true
+gift_selection_scope: micro_batch
+gift_score_mode: piecewise_conflict_residual
+gift_schedule: linear_token_budget_only
+gift_total_training_steps: 96
+gift_initial_retention: 1.0
+gift_hold_steps: 10
+gift_exit_step: 78
+gift_cosine_min: 0.0
+gift_norm_eps: 1.0e-8
+gift_support: teacher_topk_plus_tail_exact_full_logit_geometry
+gift_piecewise_zero_grpo_policy: neutral_score_zero
+gift_piecewise_zero_opsd_policy: exclude
+
+method: opsd_grpo_curriculum
+model_path: models/Qwen3-1.7B
+use_lora: false
+seed: 42
+
+learning_rate: 1e-6
+num_epochs: 2
+per_device_batch_size: 32
+group_size: 8
+ppo_mini_batch_size: 64
+max_grad_norm: 1.0
+warmup_steps: 12
+weight_decay: 0.01
+max_train_samples: 60000
+save_steps: 10
+eval_steps: 10
+logging_steps: 1
+rollout_is: token
+rollout_is_threshold: 2.0
+
+max_prompt_length: 2048
+max_completion_length: 16384
+val_max_completion_length: 38912
+actor_max_token_len_per_gpu: 24576
+temperature: 1.0
+top_p: 0.95
+top_k_sampling: 20
+student_enable_thinking: true
+val_enable_thinking: true
+val_do_sample: true
+val_n: 12
+val_temperature: 0.6
+val_top_p: 0.95
+val_top_k: 20
+val_batch_size: 16
+teacher_enable_thinking: true
+
+privileged_text_mode: solution_answer
+teacher_mode: fixed
+
+vllm_gpu_memory_utilization: 0.5
+vllm_tensor_parallel_size: 1
+
+kl_loss_coef: 0
+beta: 0.0
+jsd_token_clip: 0.0
+full_logit_distill: true
+distill_add_tail: true
+top_k_distill: 100
+opsd_grpo_lambda: 1.0
+
+output_dir: outputs/GIFT-MICROBATCH-TOKEN-ANNEAL-FULLSTART-Qwen3-1.7B-level7-10
+data_dir: data
+train_dataset: deepmath_filtered_level7_10
+val_dataset: amc23,aime24,aime25
+train_files: data/gift/deepmath_filtered_level7_10/train.parquet
+val_files: data/gift/amc23+aime24+aime25/val.parquet
+use_swanlab: false
+project_name: gift-token-anneal-qwen3-1-7b-math-level7-10
+experiment_name: qwen3_1_7b_gift_microbatch_token_anneal
+val_before_train: false
+nnodes: 2
+n_gpus_per_node: 16
